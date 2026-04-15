@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server";
-import { getOpenAI, SOAP_SYSTEM_PROMPT } from "@/lib/openai";
+import Anthropic from "@anthropic-ai/sdk";
+import { z } from "zod";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { getAnthropic, SOAP_SYSTEM_PROMPT } from "@/lib/anthropic";
 import type { SoapNote } from "@/types/soap";
 
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const MAX_TRANSCRIPT_CHARS = 60_000;
+
+const SoapNoteSchema = z.object({
+  subjective: z.string(),
+  objective: z.string(),
+  assessment: z.string(),
+  plan: z.string(),
+});
 
 export async function POST(request: Request) {
   try {
@@ -22,52 +32,43 @@ export async function POST(request: Request) {
       );
     }
 
-    const openai = getOpenAI();
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      temperature: 0.2,
-      response_format: { type: "json_object" },
+    const anthropic = getAnthropic();
+    const response = await anthropic.messages.parse({
+      model: "claude-sonnet-4-6",
+      max_tokens: 16000,
+      thinking: { type: "adaptive" },
+      system: SOAP_SYSTEM_PROMPT,
       messages: [
-        { role: "system", content: SOAP_SYSTEM_PROMPT },
         { role: "user", content: `Transcript:\n\n${transcript}` },
       ],
+      output_config: {
+        format: zodOutputFormat(SoapNoteSchema),
+      },
     });
 
-    const raw = completion.choices[0]?.message?.content;
-    if (!raw) {
-      return NextResponse.json({ error: "empty model response" }, { status: 502 });
-    }
-
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      return NextResponse.json({ error: "model returned invalid JSON" }, { status: 502 });
-    }
-
-    const note = coerceSoapNote(parsed);
+    const note: SoapNote | null = response.parsed_output;
     if (!note) {
       return NextResponse.json(
-        { error: "model response missing required SOAP fields" },
+        { error: "model returned empty or invalid SOAP note" },
         { status: 502 }
       );
     }
 
     return NextResponse.json({ note });
   } catch (err) {
+    if (err instanceof Anthropic.BadRequestError) {
+      return NextResponse.json({ error: `bad request: ${err.message}` }, { status: 400 });
+    }
+    if (err instanceof Anthropic.AuthenticationError) {
+      return NextResponse.json({ error: "invalid anthropic api key" }, { status: 500 });
+    }
+    if (err instanceof Anthropic.RateLimitError) {
+      return NextResponse.json({ error: "rate limited, retry shortly" }, { status: 429 });
+    }
+    if (err instanceof Anthropic.APIError) {
+      return NextResponse.json({ error: `anthropic error: ${err.message}` }, { status: 502 });
+    }
     const message = err instanceof Error ? err.message : "note generation failed";
     return NextResponse.json({ error: message }, { status: 500 });
   }
-}
-
-function coerceSoapNote(value: unknown): SoapNote | null {
-  if (!value || typeof value !== "object") return null;
-  const v = value as Record<string, unknown>;
-  const keys: (keyof SoapNote)[] = ["subjective", "objective", "assessment", "plan"];
-  const out: Partial<SoapNote> = {};
-  for (const k of keys) {
-    if (typeof v[k] !== "string") return null;
-    out[k] = v[k] as string;
-  }
-  return out as SoapNote;
 }

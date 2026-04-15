@@ -1,7 +1,7 @@
 # medscribe-ai
 
 AI-powered medical documentation capture. Records or uploads patient-consultation audio,
-transcribes via OpenAI Whisper, and generates structured SOAP notes via GPT-4o.
+transcribes via Groq-hosted Whisper, and generates structured SOAP notes via Claude Sonnet 4.6.
 
 > ⚠️ **MVP — SYNTHETIC DATA ONLY. NOT HIPAA-COMPLIANT. DO NOT USE WITH REAL PHI.**
 > See [HIPAA_GOLIVE.md](./HIPAA_GOLIVE.md) for the gap list before handling real patient data.
@@ -14,25 +14,26 @@ Browser (mic / upload)
   ▼
 Next.js App Router (src/app)
   │
-  ├── /api/transcribe  ──► OpenAI Whisper  ──► transcript text
+  ├── /api/transcribe  ──► Groq (whisper-large-v3-turbo)  ──► transcript text
   │
-  ├── /api/generate-note  ──► OpenAI GPT-4o  ──► SOAP JSON
+  ├── /api/generate-note  ──► Anthropic (claude-sonnet-4-6)  ──► SOAP JSON
+  │                          (messages.parse + Zod schema, adaptive thinking)
   │
   └── Supabase client  ──► Supabase (Auth + Postgres + Storage)
 ```
 
 ### Key components
 - **UI** (`src/app`, `src/components`) — Landing, dashboard, `AudioRecorder`, `TranscriptView`, `ClinicalNote`
-- **API routes** (`src/app/api`) — `transcribe/route.ts`, `generate-note/route.ts`
-- **Integrations** (`src/lib`) — `supabase.ts`, `openai.ts`
-- **Persistence** — Supabase `consultations` table (`id`, `user_id`, `audio_url`, `transcript`, `clinical_note JSONB`, `created_at`) with RLS by `user_id`
+- **API routes** (`src/app/api`) — `transcribe/route.ts` (Groq), `generate-note/route.ts` (Claude), `consultations/route.ts` (DB insert)
+- **Integrations** (`src/lib`) — `supabase*.ts`, `anthropic.ts`, `groq.ts`
+- **Persistence** — Supabase `consultations` table (`id`, `user_id`, `audio_path`, `transcript`, `clinical_note JSONB`, `created_at`) with RLS by `user_id`
 
 ### Data flow
 1. User records audio in the browser (Web Audio API) or uploads a file
-2. Audio uploaded to Supabase Storage; URL returned
-3. `/api/transcribe` streams audio to Whisper, returns transcript
-4. `/api/generate-note` sends transcript to GPT-4o with SOAP prompt, returns structured JSON
-5. Row inserted into `consultations`; UI renders the note with copy/download actions
+2. `/api/transcribe` streams audio to Groq-hosted Whisper, returns transcript
+3. `/api/generate-note` sends transcript to Claude Sonnet 4.6 via `messages.parse()` with a Zod schema for the SOAP shape; adaptive thinking enabled
+4. `/api/consultations` inserts a row into `consultations` (RLS scopes to `auth.uid()`)
+5. UI renders the note with copy/download actions and prepends it to the history list
 
 ## Conventions
 
@@ -76,7 +77,7 @@ npx eslint . --ext .ts,.tsx
 
 ### Security (MVP posture)
 - No secrets in code — `.env.local` only, gitignored
-- `OPENAI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are server-side only; never imported into client components
+- `ANTHROPIC_API_KEY`, `GROQ_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` are server-side only; never imported into client components
 - Row Level Security enabled on `consultations` — users see only their own rows
 - Demo banner required on every page: "DEMO — synthetic data only, not HIPAA-compliant"
 - Audio files auto-deleted from Supabase Storage after 24h (cron or Edge Function)
@@ -85,8 +86,8 @@ npx eslint . --ext .ts,.tsx
 - If/when this goes live with real PHI, all PHI handling must move into `src/phi/` and every data flow re-audited. See HIPAA_GOLIVE.md.
 
 ### Performance
-- Whisper call budget: <30s for 5min audio
-- SOAP generation: <10s
+- Groq Whisper budget: <10s for 5min audio (10x real-time typical)
+- Claude SOAP generation: <15s with adaptive thinking
 - No N+1 queries against Supabase
 
 ## Current State
@@ -110,6 +111,7 @@ npx eslint . --ext .ts,.tsx
 |---|---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes | client + server |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (RLS-protected) | Yes | client + server |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-only admin key | Server only | `/api` routes |
-| `OPENAI_API_KEY` | Whisper + GPT-4o | Yes | `/api` routes only — never client |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only admin key | Server only | proxy + `/api` routes |
+| `ANTHROPIC_API_KEY` | Claude Sonnet 4.6 for SOAP note generation | Yes | `/api/generate-note` only — never client |
+| `GROQ_API_KEY` | Groq-hosted Whisper for transcription | Yes | `/api/transcribe` only — never client |
 | `NEXT_PUBLIC_DEMO_MODE` | Shows demo banner | Yes (`true` for MVP) | UI |

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getOpenAI } from "@/lib/openai";
+import { getGroq, GROQ_WHISPER_MODEL } from "@/lib/groq";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const MAX_BYTES = 25 * 1024 * 1024; // Whisper API limit
+const MAX_BYTES = 25 * 1024 * 1024; // Groq Whisper limit matches OpenAI
 
 export async function POST(request: Request) {
   try {
@@ -24,10 +24,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const openai = getOpenAI();
-    const transcription = await openai.audio.transcriptions.create({
+    const groq = getGroq();
+    const transcription = await groq.audio.transcriptions.create({
       file,
-      model: "whisper-1",
+      model: GROQ_WHISPER_MODEL,
       response_format: "text",
     });
 

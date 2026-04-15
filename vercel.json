@@ -5,7 +5,7 @@
       "maxDuration": 60
     },
     "src/app/api/generate-note/route.ts": {
-      "maxDuration": 30
+      "maxDuration": 60
     }
   }
 }

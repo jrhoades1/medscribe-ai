@@ -1,15 +1,15 @@
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
-let client: OpenAI | null = null;
+let client: Anthropic | null = null;
 
-export function getOpenAI(): OpenAI {
+export function getAnthropic(): Anthropic {
   if (typeof window !== "undefined") {
-    throw new Error("OpenAI client must not be used in the browser");
+    throw new Error("Anthropic client must not be used in the browser");
   }
   if (!client) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) throw new Error("OPENAI_API_KEY is required");
-    client = new OpenAI({ apiKey });
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) throw new Error("ANTHROPIC_API_KEY is required");
+    client = new Anthropic({ apiKey });
   }
   return client;
 }
@@ -17,18 +17,6 @@ export function getOpenAI(): OpenAI {
 export const SOAP_SYSTEM_PROMPT = `You are a clinical documentation assistant helping a
 licensed clinician draft a SOAP note from a patient-consultation transcript. Your output
 is a DRAFT — a human clinician will review it before it enters the medical record.
-
-## Output format (strict)
-
-Return ONLY a valid JSON object with exactly these four string fields:
-{
-  "subjective": "...",
-  "objective": "...",
-  "assessment": "...",
-  "plan": "..."
-}
-
-No preamble. No markdown. No extra fields. No code fences.
 
 ## Section definitions
 

@@ -17,7 +17,8 @@ covering this specific use case. No BAA = no PHI.
 | Vendor | MVP status | Required for go-live |
 |---|---|---|
 | **Supabase** | Free tier — **no BAA** | Upgrade to Team plan ($599/mo) or higher, then request and countersign a BAA. Free and Pro tiers are **not** HIPAA-eligible regardless of configuration. |
-| **OpenAI (Whisper + GPT-4o)** | Standard API — **no BAA** | Move to OpenAI's Enterprise / ZDR tier and execute a BAA. Confirm BAA explicitly covers Whisper audio and GPT-4o text endpoints. |
+| **Anthropic (Claude Sonnet 4.6)** | Standard API — **no BAA** | Two paths: (1) Anthropic's Enterprise tier with a direct BAA, or (2) deploy through **AWS Bedrock** with an existing AWS BAA covering Bedrock. Bedrock is the most common compliant path. Confirm the BAA explicitly covers the Messages API and adaptive thinking. |
+| **Groq (whisper-large-v3-turbo)** | Free tier — **no BAA** | Groq does not currently offer BAAs on the self-serve tier. For real PHI, replace with a HIPAA-eligible STT: **Deepgram** (enterprise tier, offers BAA, has medical-tuned models like `nova-2-medical`), **AWS Transcribe Medical** (covered under AWS BAA), or **Azure AI Speech** (Azure BAA). Keep the client-side `openai` SDK pattern and just swap `baseURL` + model. |
 | **Vercel** | Hobby / Pro — **no BAA** | Upgrade to Vercel Enterprise and sign a BAA. Alternatively, self-host Next.js on a BAA-covered platform (AWS w/ BAA, Azure Health Data Services). |
 | **Any analytics / logging SaaS** (Sentry, PostHog, GA, Vercel Analytics) | May be wired in for MVP | Each one needs its own BAA, or must be disabled for PHI paths, or scrubbed of PHI before events leave the server. Default: disable in PHI paths. |
 
@@ -109,9 +110,13 @@ HIPAA §164.312(b) — immutable audit trail of every PHI access.
 
 ## 9. Technical Controls Specific to medscribe-ai
 
-- [ ] **Whisper/GPT payloads:** confirm prompts, transcripts, and responses are
-      not used for model training. Requires OpenAI Zero Data Retention
-      addendum in addition to the BAA.
+- [ ] **Claude payloads:** Anthropic's standard commercial terms already prohibit
+      training on API inputs and outputs. For real PHI, still require the BAA
+      in writing (Enterprise or AWS Bedrock). Confirm Zero Data Retention if using
+      Anthropic directly.
+- [ ] **Transcription payloads:** Groq is not HIPAA-eligible and will need to be
+      replaced for real PHI. The replacement vendor (Deepgram / AWS Transcribe
+      Medical / Azure) must have a BAA covering the specific audio endpoint used.
 - [ ] **Client-side recording:** browser-side audio must be encrypted before
       leaving the device, or uploaded directly to a BAA-covered endpoint —
       never through a third-party CDN or analytics pixel.
