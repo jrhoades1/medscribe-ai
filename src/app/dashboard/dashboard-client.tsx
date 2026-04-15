@@ -64,6 +64,18 @@ export function DashboardClient({ userEmail, initialHistory }: Props) {
     handleAudio(file, file.type || "audio/webm");
   }
 
+  async function trySample() {
+    try {
+      const res = await fetch("/samples/sample-consultation.mp3");
+      if (!res.ok) throw new Error("sample audio not available");
+      const blob = await res.blob();
+      handleAudio(blob, "audio/mpeg");
+    } catch (e) {
+      setStage("error");
+      setError(e instanceof Error ? e.message : "Failed to load sample");
+    }
+  }
+
   function reset() {
     setTranscript(null);
     setNote(null);
@@ -115,9 +127,9 @@ export function DashboardClient({ userEmail, initialHistory }: Props) {
 
         <AudioRecorder onRecorded={handleAudio} disabled={busy} />
 
-        <div className="mt-6 pt-6 border-t border-slate-200 text-center">
-          <label className="inline-flex flex-wrap items-center justify-center gap-2 text-sm text-slate-600">
-            <span>or upload an audio file</span>
+        <div className="mt-6 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <label className="inline-flex flex-wrap items-center gap-2 text-sm text-slate-600">
+            <span>or upload a file</span>
             <input
               type="file"
               accept="audio/*"
@@ -126,6 +138,19 @@ export function DashboardClient({ userEmail, initialHistory }: Props) {
               className="block text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border file:border-slate-300 file:bg-white file:text-slate-700 file:font-medium file:cursor-pointer hover:file:bg-slate-50 file:transition"
             />
           </label>
+          <span className="hidden sm:inline text-slate-300">·</span>
+          <button
+            type="button"
+            onClick={trySample}
+            disabled={busy}
+            className="inline-flex items-center gap-1.5 text-sm text-emerald-700 hover:text-emerald-800 disabled:text-slate-400 disabled:cursor-not-allowed font-medium transition"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            try a sample consultation
+          </button>
         </div>
       </section>
 
