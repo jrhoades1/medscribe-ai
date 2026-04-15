@@ -34,3 +34,19 @@ htmlcov/
 # Logs
 *.log
 logs/
+
+# Next.js / Vercel
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+/out/
+.vercel
+next-env.d.ts
+*.tsbuildinfo
+
+# next-init temp (remove after merge)
+next-init/
