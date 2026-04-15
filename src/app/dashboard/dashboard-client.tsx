@@ -228,6 +228,20 @@ export function DashboardClient({ userEmail, initialHistory }: Props) {
   );
 }
 
+async function parseJsonOrThrow(res: Response, step: string): Promise<unknown> {
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    // Vercel timeouts and Next.js error pages return HTML; surface a
+    // friendly message instead of a "Unexpected token '<'" parse error.
+    const text = await res.text();
+    const snippet = text.slice(0, 120).replace(/\s+/g, " ");
+    throw new Error(
+      `${step} failed: server returned ${res.status} ${res.statusText || "non-JSON"} — ${snippet}`
+    );
+  }
+  return res.json();
+}
+
 async function transcribe(blob: Blob, mimeType: string): Promise<string> {
   const ext = mimeType.includes("mp4")
     ? "mp4"
@@ -242,9 +256,13 @@ async function transcribe(blob: Blob, mimeType: string): Promise<string> {
   formData.append("audio", file);
 
   const res = await fetch("/api/transcribe", { method: "POST", body: formData });
-  const data = await res.json();
+  const data = (await parseJsonOrThrow(res, "Transcription")) as {
+    transcript?: string;
+    error?: string;
+  };
   if (!res.ok) throw new Error(data.error || "Transcription failed");
-  return data.transcript as string;
+  if (typeof data.transcript !== "string") throw new Error("Transcription returned no text");
+  return data.transcript;
 }
 
 async function generateNote(transcript: string): Promise<SoapNote> {
@@ -253,21 +271,30 @@ async function generateNote(transcript: string): Promise<SoapNote> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ transcript }),
   });
-  const data = await res.json();
+  const data = (await parseJsonOrThrow(res, "Note generation")) as {
+    note?: SoapNote;
+    error?: string;
+  };
   if (!res.ok) throw new Error(data.error || "Note generation failed");
-  return data.note as SoapNote;
+  if (!data.note) throw new Error("Note generation returned no note");
+  return data.note;
 }
 
-async function saveConsultation(transcript: string, note: SoapNote): Promise<Consultation | null> {
-  const res = await fetch("/api/consultations", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ transcript, note }),
-  });
-  if (!res.ok) {
-    // Non-fatal — the note still displays even if persistence fails.
+async function saveConsultation(
+  transcript: string,
+  note: SoapNote
+): Promise<Consultation | null> {
+  try {
+    const res = await fetch("/api/consultations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transcript, note }),
+    });
+    if (!res.ok) return null; // Non-fatal — the note still displays.
+    const data = (await parseJsonOrThrow(res, "Save")) as { consultation?: Consultation };
+    return data.consultation ?? null;
+  } catch {
+    // Persistence failures are non-fatal — the note is still in UI state.
     return null;
   }
-  const data = await res.json();
-  return data.consultation as Consultation;
 }
