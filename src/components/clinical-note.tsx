@@ -31,30 +31,39 @@ export function ClinicalNote({ note }: Props) {
   }
 
   return (
-    <section className="rounded-lg border border-emerald-900/50 bg-emerald-950/20 p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-emerald-400">
-          SOAP Note
-        </h2>
+    <section className="rounded-xl border-2 border-emerald-200 bg-white shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 bg-emerald-50 border-b border-emerald-200">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-emerald-900">
+            SOAP Clinical Note
+          </h2>
+        </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={copyToClipboard}
-            className="text-xs px-3 py-1.5 rounded border border-slate-700 hover:border-slate-500 text-slate-200 transition"
+            className="text-xs px-3 py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium transition shadow-sm"
           >
-            {copied ? "Copied ✓" : "Copy"}
+            {copied ? "✓ Copied" : "Copy"}
           </button>
           <button
             type="button"
             onClick={download}
-            className="text-xs px-3 py-1.5 rounded border border-slate-700 hover:border-slate-500 text-slate-200 transition"
+            className="text-xs px-3 py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium transition shadow-sm"
           >
             Download .txt
           </button>
         </div>
       </div>
 
-      <div className="space-y-4 text-sm">
+      {/* Body */}
+      <div className="divide-y divide-slate-200">
         <Section label="Subjective" body={note.subjective} />
         <Section label="Objective" body={note.objective} />
         <Section label="Assessment" body={note.assessment} />
@@ -66,11 +75,11 @@ export function ClinicalNote({ note }: Props) {
 
 function Section({ label, body }: { label: string; body: string }) {
   return (
-    <div>
-      <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1">
+    <div className="px-6 py-5">
+      <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2">
         {label}
       </h3>
-      <p className="whitespace-pre-wrap text-slate-200 leading-relaxed">{body}</p>
+      <p className="whitespace-pre-wrap text-slate-900 text-base leading-relaxed">{body}</p>
     </div>
   );
 }

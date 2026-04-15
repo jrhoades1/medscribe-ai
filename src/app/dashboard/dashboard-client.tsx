@@ -82,69 +82,83 @@ export function DashboardClient({ userEmail, initialHistory }: Props) {
 
   return (
     <main className="flex-1 px-6 py-10 max-w-3xl mx-auto w-full">
+      {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-xs text-slate-500 mt-1">Signed in as {userEmail}</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Signed in as <span className="text-slate-700 font-medium">{userEmail}</span>
+          </p>
         </div>
         <div className="flex items-center gap-4 text-sm">
-          <Link href="/" className="text-slate-400 hover:text-slate-200">
+          <Link
+            href="/"
+            className="text-slate-600 hover:text-slate-900 font-medium transition"
+          >
             Home
           </Link>
           <button
             type="button"
             onClick={signOut}
-            className="text-slate-400 hover:text-slate-200"
+            className="text-slate-600 hover:text-slate-900 font-medium transition"
           >
             Sign out
           </button>
         </div>
       </div>
 
-      <section className="rounded-lg border border-slate-800 bg-slate-900/60 p-8 mb-6">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400 mb-6 text-center">
+      {/* Recorder card */}
+      <section className="rounded-xl border border-slate-200 bg-white p-8 mb-6 shadow-sm">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-600 mb-6 text-center">
           Capture a Consultation
         </h2>
 
         <AudioRecorder onRecorded={handleAudio} disabled={busy} />
 
-        <div className="mt-6 pt-6 border-t border-slate-800 text-center">
-          <label className="inline-flex items-center gap-2 text-sm text-slate-400 cursor-pointer hover:text-slate-200">
-            <span>or upload a file</span>
+        <div className="mt-6 pt-6 border-t border-slate-200 text-center">
+          <label className="inline-flex flex-wrap items-center justify-center gap-2 text-sm text-slate-600">
+            <span>or upload an audio file</span>
             <input
               type="file"
               accept="audio/*"
               onChange={handleFileUpload}
               disabled={busy}
-              className="block text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded file:border file:border-slate-700 file:bg-slate-800 file:text-slate-200 file:cursor-pointer hover:file:bg-slate-700"
+              className="block text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border file:border-slate-300 file:bg-white file:text-slate-700 file:font-medium file:cursor-pointer hover:file:bg-slate-50 file:transition"
             />
           </label>
         </div>
       </section>
 
+      {/* Audio playback */}
       {audioUrl && (
-        <section className="mb-6">
+        <section className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <audio controls src={audioUrl} className="w-full" />
         </section>
       )}
 
+      {/* Processing state */}
       {busy && (
-        <div className="mb-6 rounded-lg border border-slate-800 bg-slate-900/60 p-5 text-center">
-          <div className="inline-flex items-center gap-3 text-slate-300">
-            <span className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
-            {stage === "transcribing" && "Transcribing audio via Whisper…"}
-            {stage === "generating" && "Generating SOAP note via GPT-4o…"}
-            {stage === "saving" && "Saving consultation…"}
+        <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm">
+          <div className="inline-flex items-center gap-3 text-slate-700">
+            <span className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+            <span className="font-medium">
+              {stage === "transcribing" && "Transcribing audio via Groq Whisper…"}
+              {stage === "generating" && "Generating SOAP note via Claude Sonnet 4.6…"}
+              {stage === "saving" && "Saving consultation…"}
+            </span>
           </div>
         </div>
       )}
 
+      {/* Error state */}
       {stage === "error" && error && (
-        <div className="mb-6 rounded-lg border border-red-900/50 bg-red-950/30 p-5 text-red-300 text-sm">
-          {error}
+        <div className="mb-6 rounded-xl border-2 border-red-200 bg-red-50 p-5 text-red-900 text-sm">
+          <div className="font-semibold mb-1">Something went wrong</div>
+          <div className="text-red-800">{error}</div>
         </div>
       )}
 
+      {/* Results */}
       {transcript && (
         <div className="mb-6">
           <TranscriptView transcript={transcript} />
@@ -157,25 +171,26 @@ export function DashboardClient({ userEmail, initialHistory }: Props) {
         </div>
       )}
 
+      {/* History */}
       {history.length > 0 && (
-        <section className="mt-10 pt-8 border-t border-slate-800">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400 mb-4">
+        <section className="mt-12 pt-8 border-t border-slate-200">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-600 mb-4">
             Recent Consultations
           </h2>
           <ul className="space-y-3">
             {history.map((c) => (
               <li
                 key={c.id}
-                className="rounded border border-slate-800 bg-slate-900/40 px-4 py-3 text-sm"
+                className="rounded-xl border border-slate-200 bg-white px-5 py-4 text-sm shadow-sm hover:shadow-md transition"
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-slate-500 text-xs">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-500 text-xs font-medium">
                     {new Date(c.created_at).toLocaleString()}
                   </span>
                 </div>
                 {c.clinical_note && (
-                  <p className="text-slate-300 line-clamp-2">
-                    <span className="text-emerald-400 font-semibold">Assessment:</span>{" "}
+                  <p className="text-slate-800 line-clamp-2">
+                    <span className="text-emerald-700 font-semibold">Assessment:</span>{" "}
                     {c.clinical_note.assessment}
                   </p>
                 )}
