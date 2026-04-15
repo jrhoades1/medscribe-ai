@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedScribe AI - Standalone + Partnership</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f0f23; color: #fff; line-height: 1.6; }
+        .slide { min-height: 100vh; padding: 60px 80px; display: flex; flex-direction: column; justify-content: center; border-bottom: 1px solid #1e1e3f; }
+        .slide:nth-child(even) { background: #0a0a1a; }
+        h1 { font-size: 3.5rem; color: #00d4ff; margin-bottom: 30px; font-weight: 700; }
+        h2 { font-size: 2.5rem; color: #00d4ff; margin-bottom: 40px; font-weight: 600; }
+        h3 { font-size: 1.8rem; color: #7dd3fc; margin-bottom: 20px; }
+        p { font-size: 1.4rem; color: #c0c0d0; margin-bottom: 20px; max-width: 900px; }
+        li { font-size: 1.3rem; color: #c0c0d0; margin-bottom: 15px; padding-left: 30px; position: relative; }
+        li::before { content: "▸"; color: #00d4ff; position: absolute; left: 0; }
+        .highlight { color: #00d4ff; font-weight: 600; }
+        .big-number { font-size: 4rem; font-weight: 700; color: #ff6b6b; margin-bottom: 10px; }
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+        .three-column { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; }
+        .card { background: #1a1a3e; padding: 40px; border-radius: 20px; border: 1px solid #2a2a5e; }
+        .card h3 { color: #00d4ff; }
+        .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .timeline-item { background: #1a1a3e; padding: 30px; border-radius: 15px; text-align: center; }
+        .timeline-item h4 { color: #00d4ff; font-size: 1.2rem; margin-bottom: 15px; }
+        .timeline-item p { font-size: 1rem; color: #888; }
+        .partnership-box { background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); padding: 50px; border-radius: 20px; text-align: center; margin: 30px 0; }
+        .partnership-box h3 { color: #fff; font-size: 2rem; }
+        .partnership-box p { color: rgba(255,255,255,0.9); font-size: 1.3rem; }
+        .channel-box { background: #1a1a3e; padding: 30px; border-radius: 15px; margin-bottom: 20px; }
+        .channel-box h4 { color: #00d4ff; margin-bottom: 10px; }
+        .footer { padding: 40px; text-align: center; color: #666; }
+        @media print { .slide { page-break-after: always; min-height: auto; padding: 40px; } }
+    </style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title -->
+<div class="slide">
+    <h1>MedScribe AI</h1>
+    <h3>AI-Powered Medical Documentation</h3>
+    <p style="margin-top: 40px; color: #666;">A standalone product + partnership opportunity</p>
+</div>
+
+<!-- SLIDE 2: Standalone Product -->
+<div class="slide">
+    <h2>🚀 Standalone Product</h2>
+    <p class="big-number">$4.5B</p>
+    <p>Ambient AI scribe market by 2027</p>
+    <div class="three-column" style="margin-top: 40px;">
+        <div class="card">
+            <h3>For Individual Docs</h3>
+            <ul>
+                <li>Solo & small practices</li>
+                <li>Consultation recording</li>
+                <li>Auto SOAP notes</li>
+                <li>Copy/download notes</li>
+                <li><strong class="highlight">$49-99/mo</strong></li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>For Clinics</h3>
+            <ul>
+                <li>Multi-user access</li>
+                <li>Team analytics</li>
+                <li>EHR integration</li>
+                <li>Priority support</li>
+                <li><strong class="highlight">$199-499/mo</strong></li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>Enterprise</h3>
+            <ul>
+                <li>Custom integrations</li>
+                <li>Dedicated instance</li>
+                <li>SLA guarantees</li>
+                <li>On-premise option</li>
+                <li><strong class="highlight">Custom pricing</strong></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 3: Key Features -->
+<div class="slide">
+    <h2>⚡ Key Features</h2>
+    <div class="two-column">
+        <div>
+            <h3>🎙️ Audio Capture</h3>
+            <ul>
+                <li>Browser-based recording</li>
+                <li>Works on any device</li>
+                <li>Multiple audio format support</li>
+            </ul>
+            <h3 style="margin-top: 30px;">🔄 Whisper Integration</h3>
+            <ul>
+                <li>Best-in-class speech-to-text</li>
+                <li>Medical terminology optimized</li>
+                <li>Real-time transcription ready</li>
+            </ul>
+        </div>
+        <div>
+            <h3>📝 Clinical Intelligence</h3>
+            <ul>
+                <li>GPT-4 powered note generation</li>
+                <li>SOAP, H&P, progress notes</li>
+                <li>Specialty-specific prompts</li>
+            </ul>
+            <h3 style="margin-top: 30px;">🔗 Integrations</h3>
+            <ul>
+                <li>Supabase (auth/storage)</li>
+                <li>EHR systems (via API)</li>
+                <li>HL7/FHIR ready</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 4: Partnership Opportunity -->
+<div class="slide">
+    <h2>🤝 Partnership Opportunity</h2>
+    <div class="partnership-box">
+        <h3>With Modernizing Medicine</h3>
+        <p>Embed MedScribe directly into ModMed's specialty EHR platform</p>
+    </div>
+    <div class="two-column">
+        <div class="card">
+            <h3>What ModMed Gets</h3>
+            <ul>
+                <li>AI scribe already proven (240K visits)</li>
+                <li>Specialty-specific optimization</li>
+                <li>Differentiation vs competitors</li>
+                <li>Upsell revenue stream</li>
+                <li>Reduced doctor burnout</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>What MedScribe Gets</h3>
+            <ul>
+                <li>Distribution to 10K+ practices</li>
+                <li>Instant credibility</li>
+                <li>Enterprise infrastructure</li>
+                <li>Data for model training</li>
+                <li>Recurring revenue</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 5: Partnership Models -->
+<div class="slide">
+    <h2>💰 Partnership Models</h2>
+    <div class="three-column">
+        <div class="card">
+            <h3>Option A: Embed</h3>
+            <p style="color: #888; font-size: 1rem;">White-label integration</p>
+            <ul>
+                <li>MedScribe embedded in ModMed</li>
+                <li>ModMed brands it</li>
+                <li>Revenue share: 30-40% to MedScribe</li>
+                <li>Support handled by ModMed</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>Option B: Reseller</h3>
+            <p style="color: #888; font-size: 1rem;">Partner sells standalone</p>
+            <ul>
+                <li>ModMed resells MedScribe</li>
+                <li>ModMed gets markup</li>
+                <li>MedScribe handles support</li>
+                <li>Faster deployment</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>Option C: Acquire</h3>
+            <p style="color: #888; font-size: 1rem;">Full acquisition</p>
+            <ul>
+                <li>ModMed acquires MedScribe</li>
+                <li>Team joins full-time</li>
+                <li>Equity + salary</li>
+                <li>Build within ModMed</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 6: Go-to-Market -->
+<div class="slide">
+    <h2>📈 Go-to-Market Strategy</h2>
+    <h3>Channel Distribution</h3>
+    <div class="two-column" style="margin-top: 30px;">
+        <div class="channel-box">
+            <h4>🏥 Direct to Practices</h4>
+            <ul>
+                <li>Target: Dermatology, Orthopedics, Podiatry</li>
+                <li>Cold outreach via LinkedIn</li>
+                <li>Webinars with thought leaders</li>
+                <li>Freemium pilot program</li>
+            </ul>
+        </div>
+        <div class="channel-box">
+            <h4>🏢 Enterprise Sales</h4>
+            <ul>
+                <li>Target: Hospital systems, MSOs</li>
+                <li>Sales team + demos</li>
+                <li>RFP responses</li>
+                <li>Contract negotiation</li>
+            </ul>
+        </div>
+        <div class="channel-box">
+            <h4>🔗 Partner Channel</h4>
+            <ul>
+                <li>ModMed (target #1)</li>
+                <li>Other EHR vendors</li>
+                <li>Medical supply companies</li>
+                <li>Consulting firms</li>
+            </ul>
+        </div>
+        <div class="channel-box">
+            <h4>📱 Product-Led Growth</h4>
+            <ul>
+                <li>Free tier for doctors</li>
+                <li>Viral demo videos</li>
+                <li>Reddit r/medicine</li>
+                <li>Doctor forums</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 7: Marketing Plan -->
+<div class="slide">
+    <h2>📣 Marketing Plan</h2>
+    <h3>12-Month Roadmap</h3>
+    <div class="timeline" style="margin-top: 30px;">
+        <div class="timeline-item">
+            <h4>Months 1-3</h4>
+            <p>Launch MVP, get first 10 paying customers, collect testimonials</p>
+        </div>
+        <div class="timeline-item">
+            <h4>Months 4-6</h4>
+            <p>50 customers, start content marketing, attend 2 conferences</p>
+        </div>
+        <div class="timeline-item">
+            <h4>Months 7-9</h4>
+            <p>Approach ModMed, pilot partnership talks, 100+ customers</p>
+        </div>
+        <div class="timeline-item">
+            <h4>Months 10-12</h4>
+            <p>Close partnership or Series A, scale to 500+ customers</p>
+        </div>
+    </div>
+    <div class="two-column" style="margin-top: 40px;">
+        <div>
+            <h3>Content Marketing</h3>
+            <ul>
+                <li>YouTube: "AI for doctors" tutorials</li>
+                <li>Blog: SEO for "AI scribe", "medical documentation"</li>
+                <li>LinkedIn: Thought leadership posts</li>
+                <li>Podcast: Interviews with doctor users</li>
+            </ul>
+        </div>
+        <div>
+            <h3>Events</h3>
+            <ul>
+                <li>AAOS (orthopedics)</li>
+                <li>AAD (dermatology)</li>
+                <li>HLTH conference</li>
+                <li>Local medical society meetups</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 8: Competition -->
+<div class="slide">
+    <h2>⚔️ Competitive Landscape</h2>
+    <div class="card" style="margin-bottom: 30px;">
+        <h3>Competitors</h3>
+        <ul>
+            <li><strong>Nuance Dragon</strong> - Enterprise, expensive, desktop-only</li>
+            <li><strong>ModMed Scribe</strong> - Good but generic, limited specialties</li>
+            <li><strong>Heidi Health</strong> - Emerging, UK-focused</li>
+            <li><strong>Ambient (Microsoft)</strong> - Hospital-focused</li>
+        </ul>
+    </div>
+    <h3>MedScribe Differentiation</h3>
+    <ul>
+        <li><span class="highlight">Cloud-first</span> - Works on any device, no installation</li>
+        <li><span class="highlight">Specialty-optimized</span> - Custom prompts for each field</li>
+        <li><span class="highlight">Affordable</span> - 50% less than enterprise solutions</li>
+        <li><span class="highlight">Open architecture</span> - Easy EHR integration</li>
+    </ul>
+</div>
+
+<!-- SLIDE 9: Ask -->
+<div class="slide">
+    <h2>🎯 The Ask</h2>
+    <div class="two-column">
+        <div>
+            <h3>If Joining ModMed</h3>
+            <ul>
+                <li>AI Implementation Specialist role</li>
+                <li>Build and lead scribe practice</li>
+                <li>Ownership of specialty optimization</li>
+                <li>Salary + equity + benefits</li>
+            </ul>
+        </div>
+        <div>
+            <h3>If Partnership</h3>
+            <ul>
+                <li>Integration partnership deal</li>
+                <li>Revenue share or flat fee</li>
+                <li>Technical integration support</li>
+                <li>Continued product development</li>
+            </ul>
+        </div>
+    </div>
+    <div class="partnership-box" style="margin-top: 40px;">
+        <h3>Let's Build Together</h3>
+        <p>Jimmy Rhoades | jimmyrhoades1@gmail.com</p>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <p>MedScribe AI - Open Source + Partnership Ready</p>
+</div>
+
+</body>
+</html>
