@@ -1,8 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
 export type Consultation = {
   id: string;
   user_id: string;
@@ -29,14 +26,11 @@ export type Database = {
   };
 };
 
-export function createBrowserClient(): SupabaseClient<Database> {
-  return createClient<Database>(url, anonKey);
-}
-
 export function createServiceClient(): SupabaseClient<Database> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceKey) {
-    throw new Error("SUPABASE_SERVICE_ROLE_KEY is required for server-side operations");
+  if (!url || !serviceKey) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required");
   }
   return createClient<Database>(url, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
