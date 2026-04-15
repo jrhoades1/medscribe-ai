@@ -10,11 +10,25 @@ export const maxDuration = 60;
 
 const MAX_TRANSCRIPT_CHARS = 60_000;
 
+const DiagnosisCodeSchema = z.object({
+  code: z.string(),
+  description: z.string(),
+  confidence: z.enum(["high", "medium", "low"]),
+});
+
+const EMCodeSchema = z.object({
+  code: z.string(),
+  description: z.string(),
+  rationale: z.string(),
+});
+
 const SoapNoteSchema = z.object({
   subjective: z.string(),
   objective: z.string(),
   assessment: z.string(),
   plan: z.string(),
+  diagnosis_codes: z.array(DiagnosisCodeSchema).optional(),
+  billing_code: EMCodeSchema.optional(),
 });
 
 export async function POST(request: Request) {

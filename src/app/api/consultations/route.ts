@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
-import type { SoapNote } from "@/types/soap";
+import type { DiagnosisCode, SoapNote } from "@/types/soap";
 
 export const runtime = "nodejs";
 
@@ -53,11 +53,49 @@ export async function POST(request: Request) {
 function coerceSoapNote(value: unknown): SoapNote | null {
   if (!value || typeof value !== "object") return null;
   const v = value as Record<string, unknown>;
-  const keys: (keyof SoapNote)[] = ["subjective", "objective", "assessment", "plan"];
-  const out: Partial<SoapNote> = {};
-  for (const k of keys) {
-    if (typeof v[k] !== "string") return null;
-    out[k] = v[k] as string;
+
+  // Required string fields
+  if (
+    typeof v.subjective !== "string" ||
+    typeof v.objective !== "string" ||
+    typeof v.assessment !== "string" ||
+    typeof v.plan !== "string"
+  ) {
+    return null;
   }
-  return out as SoapNote;
+
+  const note: SoapNote = {
+    subjective: v.subjective,
+    objective: v.objective,
+    assessment: v.assessment,
+    plan: v.plan,
+  };
+
+  // Optional structured fields — passthrough only if well-shaped.
+  if (Array.isArray(v.diagnosis_codes)) {
+    const codes = v.diagnosis_codes.filter(
+      (c): c is DiagnosisCode =>
+        !!c &&
+        typeof c === "object" &&
+        typeof (c as Record<string, unknown>).code === "string" &&
+        typeof (c as Record<string, unknown>).description === "string" &&
+        ["high", "medium", "low"].includes(
+          (c as Record<string, unknown>).confidence as string
+        )
+    );
+    if (codes.length > 0) note.diagnosis_codes = codes;
+  }
+
+  if (v.billing_code && typeof v.billing_code === "object") {
+    const bc = v.billing_code as Record<string, unknown>;
+    if (
+      typeof bc.code === "string" &&
+      typeof bc.description === "string" &&
+      typeof bc.rationale === "string"
+    ) {
+      note.billing_code = { code: bc.code, description: bc.description, rationale: bc.rationale };
+    }
+  }
+
+  return note;
 }
